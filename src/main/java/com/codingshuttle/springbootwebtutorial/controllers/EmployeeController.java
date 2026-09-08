@@ -15,14 +15,11 @@ import java.util.List;
 public class EmployeeController {
 
     private final EmployeeService employeeService;
-
-
     public EmployeeController(EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
-
     @GetMapping(path = "/{id}")
-    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id){
+    public ResponseEntity<EmployeeDTO> getEmployeeById(@PathVariable Long id) {
         EmployeeDTO employeeDTO = employeeService.getEmployeeById(id);
         if(employeeDTO == null){
             return ResponseEntity.notFound().build();
@@ -30,16 +27,38 @@ public class EmployeeController {
         return ResponseEntity.ok(employeeDTO);
     }
 
-    // 2. Get All Employees
     @GetMapping
     public ResponseEntity<List<EmployeeDTO>> getAllEmployees() {
         return ResponseEntity.ok(employeeService.getAllEmployees());
     }
 
-    // 3. Create a New Employee
     @PostMapping
-    public ResponseEntity<EmployeeDTO> createNewEmployee(@RequestBody @Valid EmployeeDTO inputEmployee) {
+    public ResponseEntity<EmployeeDTO> createNewEmployee(@Valid @RequestBody EmployeeDTO inputEmployee) {
         EmployeeDTO savedEmployee = employeeService.createNewEmployee(inputEmployee);
-        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED);
+        return new ResponseEntity<>(savedEmployee, HttpStatus.CREATED) ;
+    }
+
+    // 4. Update an Employee (PUT)
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<EmployeeDTO> updateEmployeeById(@RequestBody @Valid EmployeeDTO employeeDTO, @PathVariable Long id) {
+        EmployeeDTO updatedEmployee = employeeService.updateEmployeeById(id, employeeDTO);
+        if (updatedEmployee == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updatedEmployee);
+    }
+
+    // 5. Delete an Employee (DELETE)
+    @DeleteMapping(path = "/{id}")
+    public ResponseEntity<Boolean> deleteEmployeeById(@PathVariable Long id) {
+        boolean gotDeleted = employeeService.deleteEmployeeById(id);
+        if (!gotDeleted) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(true);
+    }
+
+    // 6. Partially Update an Employee (PATCH)
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<EmployeeDTO> updatePartialEmployeeById(@RequestBody java.util.Map<String, Object> updates, @PathVariable Long id) {
+        EmployeeDTO updatedEmployee = employeeService.updatePartialEmployeeById(id, updates);
+        if (updatedEmployee == null) return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(updatedEmployee);
     }
 }

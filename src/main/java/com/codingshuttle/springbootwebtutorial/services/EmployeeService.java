@@ -11,29 +11,20 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmployeeService {
-
     private final EmployeeRepository employeeRepository;
     private final ModelMapper modelMapper;
-
 
     public EmployeeService(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
         this.employeeRepository = employeeRepository;
         this.modelMapper = modelMapper;
     }
 
-    // 1. Save a new Employee
-    public EmployeeDTO createNewEmployee(EmployeeDTO inputEmployee) {
-        // Convert DTO (from client) -> Entity (for database)
-        EmployeeEntity toSaveEntity = modelMapper.map(inputEmployee, EmployeeEntity.class);
-
-        // Save to database
+    public EmployeeDTO createNewEmployee(EmployeeDTO employeeDTO) {
+        EmployeeEntity toSaveEntity = modelMapper.map(employeeDTO, EmployeeEntity.class);
         EmployeeEntity savedEntity = employeeRepository.save(toSaveEntity);
-
-        // Convert Entity (from database) back to DTO (for client)
         return modelMapper.map(savedEntity, EmployeeDTO.class);
     }
 
-    // 2. Get an Employee by ID
     public EmployeeDTO getEmployeeById(Long id) {
         EmployeeEntity employeeEntity = employeeRepository.findById(id).orElse(null);
         if (employeeEntity == null) return null;
@@ -41,13 +32,49 @@ public class EmployeeService {
         return modelMapper.map(employeeEntity, EmployeeDTO.class);
     }
 
-    // 3. Get all Employees
     public List<EmployeeDTO> getAllEmployees() {
         List<EmployeeEntity> employeeEntities = employeeRepository.findAll();
-
-        return employeeEntities
-                .stream()
-                .map(employeeEntity -> modelMapper.map(employeeEntity, EmployeeDTO.class))
-                .collect(Collectors.toList());
+        return employeeEntities.stream().map(employeeEntity -> modelMapper.map(employeeEntity, EmployeeDTO.class)).collect(Collectors.toList());
     }
+
+    public EmployeeDTO updateEmployeeById(Long id, EmployeeDTO employeeDTO) {
+        EmployeeEntity employeeEntity = employeeRepository.findById(id).orElse(null);
+        if (employeeEntity == null) return null;
+
+        modelMapper.map(employeeDTO, employeeEntity);
+        employeeEntity.setId(id);
+        EmployeeEntity savedEntity = employeeRepository.save(employeeEntity);
+        return modelMapper.map(savedEntity, EmployeeDTO.class);
+    }
+
+    public boolean deleteEmployeeById(Long id) {
+        boolean exists = employeeRepository.existsById(id);
+        if (!exists) return false;
+        employeeRepository.deleteById(id);
+        return true;
+
+    }
+
+    public EmployeeDTO updatePartialEmployeeById(Long id, java.util.Map<String, Object> updates) {
+        EmployeeEntity employeeEntity = employeeRepository.findById(id).orElse(null);
+        if (employeeEntity == null) return null;
+
+        updates.forEach((field, value) -> {
+            // 1. Fix: Search inside EmployeeEntity.class, not EmployeeDTO.class
+            java.lang.reflect.Field fieldToBeUpdated = org.springframework.util.ReflectionUtils.findField(EmployeeEntity.class, field);
+
+            // 2. Fix: Add a null check to prevent app crashes if a bad field name is sent
+            if (fieldToBeUpdated != null) {
+                fieldToBeUpdated.setAccessible(true);
+                org.springframework.util.ReflectionUtils.setField(fieldToBeUpdated, employeeEntity, value);
+            }
+        });
+
+        // 3. Fix: Use a new variable name (savedEntity) so employeeEntity remains "effectively final"
+        EmployeeEntity savedEntity = employeeRepository.save(employeeEntity);
+        return modelMapper.map(savedEntity, EmployeeDTO.class);
+    }
+
+
+
 }
