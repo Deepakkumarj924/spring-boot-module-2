@@ -1,6 +1,7 @@
 package com.codingshuttle.springbootwebtutorial.dto;
 
 import com.codingshuttle.springbootwebtutorial.annotations.EmployeeRoleValidation;
+import com.codingshuttle.springbootwebtutorial.annotations.EmployeeSalaryValadation;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -39,6 +40,6 @@ public class EmployeeDTO {
     private String role;
 
     @NotNull(message = "Salary of Employee should be not null")
-    @Positive(message = "Salary of Employee should be positive")
+    @EmployeeSalaryValadation
     private Double salary;
 }

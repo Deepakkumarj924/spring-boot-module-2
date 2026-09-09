@@ -56,7 +56,7 @@ public class EmployeeController {
 
     // 6. Partially Update an Employee (PATCH)
     @PatchMapping(path = "/{id}")
-    public ResponseEntity<EmployeeDTO> updatePartialEmployeeById(@RequestBody java.util.Map<String, Object> updates, @PathVariable Long id) {
+    public ResponseEntity<EmployeeDTO> updatePartialEmployeeById(@RequestBody @Valid java.util.Map<String, Object> updates, @PathVariable Long id) {
         EmployeeDTO updatedEmployee = employeeService.updatePartialEmployeeById(id, updates);
         if (updatedEmployee == null) return ResponseEntity.notFound().build();
         return ResponseEntity.ok(updatedEmployee);
