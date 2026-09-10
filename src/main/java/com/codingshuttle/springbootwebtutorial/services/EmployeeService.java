@@ -2,6 +2,7 @@ package com.codingshuttle.springbootwebtutorial.services;
 
 import com.codingshuttle.springbootwebtutorial.dto.EmployeeDTO;
 import com.codingshuttle.springbootwebtutorial.entities.EmployeeEntity;
+import com.codingshuttle.springbootwebtutorial.exceptions.ResourceNotFoundException;
 import com.codingshuttle.springbootwebtutorial.repositories.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -57,7 +58,9 @@ public class EmployeeService {
 
     public EmployeeDTO updatePartialEmployeeById(Long id, java.util.Map<String, Object> updates) {
         EmployeeEntity employeeEntity = employeeRepository.findById(id).orElse(null);
-        if (employeeEntity == null) return null;
+        if (employeeEntity == null) {
+           throw new ResourceNotFoundException("Employee not found with id " + id);
+        };
 
         updates.forEach((field, value) -> {
             // 1. Fix: Search inside EmployeeEntity.class, not EmployeeDTO.class

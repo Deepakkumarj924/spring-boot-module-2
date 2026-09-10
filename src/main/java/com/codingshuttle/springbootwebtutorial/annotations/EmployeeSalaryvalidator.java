@@ -7,6 +7,7 @@ public class EmployeeSalaryvalidator implements ConstraintValidator<EmployeeRole
 
     @Override
     public boolean isValid(Double value, ConstraintValidatorContext context) {
-        return value >= 0 && value <= 10000;
+
+        return value >= 0 && value <= 70000;
     }
 }
