@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-@Constraint(validatedBy = EmployeeRoleValidator.class)
+@Constraint(validatedBy = EmployeeSalaryValidator.class)
 public @interface EmployeeSalaryValadation {
     String message () default "Salary amount must be between 0 and 10000";
     Class<?>[] groups() default {};

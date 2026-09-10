@@ -46,8 +46,7 @@ public class EmployeeController {
     @PutMapping(path = "/{id}")
     public ResponseEntity<EmployeeDTO> updateEmployeeById(@RequestBody @Valid EmployeeDTO employeeDTO, @PathVariable Long id) {
         EmployeeDTO updatedEmployee = employeeService.updateEmployeeById(id, employeeDTO);
-        if (updatedEmployee == null) return ResponseEntity.notFound().build();
-        return ResponseEntity.ok(updatedEmployee);
+        return new ResponseEntity<>(updatedEmployee, HttpStatus.OK);
     }
 
     // 5. Delete an Employee (DELETE)
